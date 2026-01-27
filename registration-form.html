@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login page</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #0f172a; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; color: white; }
+        .card { background: #1e293b; padding: 30px; border-radius: 15px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-top: 5px solid #38bdf8; text-align: center; }
+        .tabs { display: flex; justify-content: space-around; margin-bottom: 25px; border-bottom: 1px solid #334155; }
+        .tab { padding: 10px; cursor: pointer; color: #94a3b8; font-weight: bold; }
+        .tab.active { color: #38bdf8; border-bottom: 3px solid #38bdf8; }
+        .form-content { display: none; }
+        .form-content.active { display: block; }
+        input { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: white; margin-bottom: 15px; outline: none; }
+        .btn { width: 100%; padding: 12px; background: #38bdf8; border: none; color: #0f172a; font-weight: bold; border-radius: 8px; cursor: pointer; }
+        #status { margin-bottom: 15px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div id="auth-section">
+        <div class="tabs">
+            <div class="tab active" id="loginTab" onclick="switchForm('login')">Login</div>
+            <div class="tab" id="regTab" onclick="switchForm('register')">Register</div>
+        </div>
+        <div id="status"></div>
+        
+        <div id="loginForm" class="form-content active">
+            <input type="email" id="l_email" placeholder="Email Address">
+            <input type="password" id="l_pass" placeholder="Access Pin">
+           <button class="btn" onclick="login()">LOGIN & ENTER</button>
+        </div>
+
+        <div id="registerForm" class="form-content">
+            <input type="text" id="r_name" placeholder="Full Name">
+            <input type="email" id="r_email" placeholder="Email Address">
+            <input type="password" id="r_pass" placeholder="Set Access Pin (Min 6)">
+            <button class="btn" onclick="register()">CREATE ACCOUNT</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Apni Firebase details yahan daalein
+    const firebaseConfig = {
+        apiKey: "AIzaSyBOqt5Pe6q_hiJbCTly7MQ_8ob4ICyMmx4",
+        authDomain: "vector-classes-6c2a7.firebaseapp.com",
+        projectId: "vector-classes-6c2a7",
+        storageBucket: "vector-classes-6c2a7.firebasestorage.app",
+        messagingSenderId: "975898657895",
+        appId: "1:975898657895:web:52e4f64e50a45d434840c2"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // 2. Login hone par kahan bhejna hai? (Website Link badlein)
+    const redirectURL = "home.html"; 
+
+    function switchForm(type) {
+        document.querySelectorAll('.form-content').forEach(f => f.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        if(type === 'login') {
+            document.getElementById('loginForm').classList.add('active');
+            document.getElementById('loginTab').classList.add('active');
+        } else {
+            document.getElementById('registerForm').classList.add('active');
+            document.getElementById('regTab').classList.add('active');
+        }
+    }
+
+    function register() {
+        const email = document.getElementById('r_email').value;
+        const pass = document.getElementById('r_pass').value;
+        const status = document.getElementById('status');
+
+        auth.createUserWithEmailAndPassword(email, pass)
+            .then(() => {
+                status.style.color = "#22c55e";
+                status.innerText = "Registration Success! Please Login.";
+                switchForm('login');
+            })
+            .catch(err => {
+                status.style.color = "#ef4444";
+                status.innerText = err.message;
+            });
+    }
+
+    function login() {
+        const email = document.getElementById('l_email').value;
+        const pass = document.getElementById('l_pass').value;
+        const status = document.getElementById('status');
+
+        auth.signInWithEmailAndPassword(email, pass)
+            .then(() => {
+                status.style.color = "#22c55e";
+                status.innerText = "Login Success!";
+                // Redirect Logic
+                setTimeout(() => {
+                    window.location.href = redirectURL;
+                }, 1000);
+            })
+            .catch(err => {
+                status.style.color = "#ef4444";
+                status.innerText = "Invalid Credentials!";
+            });
+    }
+</script>
+
+</body>
+</html>
